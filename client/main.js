@@ -4,7 +4,12 @@ import { ReactiveVar } from 'meteor/reactive-var';
 import './main.html';
 
 
+var loading = function(start){
 
+  if (start){
+    Session.set("data", "Loading");
+  }
+}
 
 Template.hello.onCreated(function helloOnCreated() {
 
@@ -13,14 +18,14 @@ Template.hello.onCreated(function helloOnCreated() {
 
 if (Meteor.isClient){
 
-  Template.hello.helpers({
+  Template.result.helpers({
 	result:function(){
 
 		return Session.get('data');
-	}	
-	  
-	  
-	  
+	}
+
+
+
   });
 
 
@@ -42,20 +47,25 @@ if (Meteor.isClient){
       //      console.log(result);
       // });
     },
-	'click submit':function(event){
-		event.preventDefault();
-        var email = $('[name=email]').val();
-        var password = $('[name=password]').val();
-        Accounts.createUser({
-            email: email,
-            password: password
-        });
-		
-		
+	'submit form':function(event){
+  		event.preventDefault();
+      loading(true);
+      var email = $('[name=email]').val();
+      var password = $('[name=password]').val();
+
+      Meteor.call('register', email, password, function(err, res){
+        if(err){
+          console.log(err);
+          Session.set("data", err.reason);
+        }else{
+          Session.set("data", res);
+          console.log(Meteor.users.find({'email':"john"}).fetch());
+        }
+      });
 	},
     'click .length':function(event, instance) {
-		
-		
+
+
 		Meteor.call('getStakeholderLength', 'init', function(err, res){
 			if(err){
 				alert('Error');
@@ -67,7 +77,7 @@ if (Meteor.isClient){
 
     },
     'click .addMember':function(event, instance) {
-		
+
 		Meteor.call('addMember', 'init', function(err, res){
 			if(err){
 				alert('Error');

@@ -1,4 +1,6 @@
 import { Meteor } from 'meteor/meteor';
+var CongressAddr = "d2ae3d423a1c77021f65b95f1502d3a32b9b529f";
+var token = "e22aef855bb045f7904fc4712e7668a9";
 
 var callJson = {
     "private": "51ca1b67efb999415260ef43194ff90ffd72887c607edde8dfd433c58fc08b8e",
@@ -10,6 +12,41 @@ var faucet = {
     "amount": 1000000000000000000
 };
 
+
+/*----------
+    post
+-----------*/
+
+
+var API_Register = function(email, password, callback){
+  Meteor.http.call("POST","https://api.blockcypher.com/v1/beth/test/addrs?token="+token, function(error,result){
+      if (error){
+        callback(error, null);
+      }else{
+        addr = result;
+        //console.log(addr.data.private);
+        try{
+          Accounts.createUser({
+              email: email,
+              password: password,
+              address: addr.data.address,
+              private: addr.data.private
+          });
+        }catch(e){
+          callback(e, null);
+
+        }
+
+        callback(null, "success");
+
+      }
+  });
+}
+
+
+/*----------
+    get
+-----------*/
 
 if (Meteor.isServer){
   Meteor.methods({
@@ -25,12 +62,23 @@ if (Meteor.isServer){
 	  },
 	  'addMember':function(){
 		  Meteor.http.call("POST","https://api.blockcypher.com/v1/beth/test/contracts/"+CongressAddr+"?token="+token,function(error,result){
-			if (error)}{
-				return "error";
+			if (error){
+				return error;
 			}
 			   console.log(result);
 			   return "success";
-		  }); 
-	  }
+		  });
+	  },
+    'register':function(email, password){
+      this.unblock();
+
+      // avoid blocking other method calls from the same client
+      // asynchronous call to the dedicated API calling function
+      var response = Meteor.wrapAsync(API_Register)(email, password);
+      console.log(response);
+      return response;
+
+
+    }
   });
 }

@@ -24,3 +24,5 @@ http
 session
 shcherbin:flexbox-grid
 twbs:bootstrap
+accounts-password
+accounts-ui
