@@ -42,6 +42,17 @@ if (Meteor.isClient){
       //      console.log(result);
       // });
     },
+	'click submit':function(event){
+		event.preventDefault();
+        var email = $('[name=email]').val();
+        var password = $('[name=password]').val();
+        Accounts.createUser({
+            email: email,
+            password: password
+        });
+		
+		
+	},
     'click .length':function(event, instance) {
 		
 		
