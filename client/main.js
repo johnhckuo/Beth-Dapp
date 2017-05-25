@@ -14,7 +14,7 @@ Template.hello.onCreated(function helloOnCreated() {
 if (Meteor.isClient){
 
   Template.hello.helpers({
-	'result':function(){
+	result:function(){
 
 		return Session.get('data');
 	}	
